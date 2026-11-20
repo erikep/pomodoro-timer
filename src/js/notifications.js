@@ -56,7 +56,8 @@ export class NotificationManager {
         const alarms = {
             original: () => this.playOriginalBeep(),
             'relaxing-chime': () => this.playRelaxingChime(),
-            'urgent-alert': () => this.playUrgentAlert()
+            'urgent-alert': () => this.playUrgentAlert(),
+            tomato: () => this.playTomatoAlarm()
         };
         
         (alarms[alarm] || alarms['relaxing-chime'])();
@@ -228,6 +229,50 @@ export class NotificationManager {
         playRhythmHit(1.48, 1046.5, 105, 0.32);
 
         setTimeout(() => audioContext.close(), duration * 1000 + 120);
+    }
+
+    static playTomatoAlarm() {
+        if (!('speechSynthesis' in window)) {
+            this.playOriginalBeep();
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        // Randomly say "tomato" either 6 or 7 times each time the alarm fires.
+        const count = Math.random() < 0.5 ? 6 : 7;
+        let spoken = 0;
+        const softVoice = window.speechSynthesis
+            .getVoices()
+            .find((voice) => /samantha|karen|moira|fiona|serena|soft|female/i.test(voice.name));
+
+        const speakNext = () => {
+            if (spoken >= count) {
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance('tomato');
+            utterance.rate = 0.78;
+            utterance.pitch = 0.82;
+            utterance.volume = 0.55;
+            if (softVoice) {
+                utterance.voice = softVoice;
+            }
+
+            utterance.onend = () => {
+                spoken += 1;
+                // Brief pause between repetitions so it feels calm, not abrupt.
+                setTimeout(speakNext, 320);
+            };
+            utterance.onerror = () => {
+                spoken += 1;
+                setTimeout(speakNext, 320);
+            };
+
+            window.speechSynthesis.speak(utterance);
+        };
+
+        speakNext();
     }
 
     /** PNG data URL so icons work on GitHub Pages without a separate asset path. */

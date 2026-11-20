@@ -7,7 +7,8 @@ export const DEFAULT_DURATIONS = {
 export const NOTIFICATION_ALARMS = {
     ORIGINAL: 'original',
     RELAXING_CHIME: 'relaxing-chime',
-    URGENT_ALERT: 'urgent-alert'
+    URGENT_ALERT: 'urgent-alert',
+    TOMATO: 'tomato'
 };
 
 export const DEFAULT_NOTIFICATION_ALARM = NOTIFICATION_ALARMS.RELAXING_CHIME;
